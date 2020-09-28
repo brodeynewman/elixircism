@@ -53,8 +53,8 @@ defmodule RobotSimulator do
   Valid instructions are: "R" (turn right), "L", (turn left), and "A" (advance)
   """
   def simulate(robot, instructions) do
-    {curr, next} = String.next_grapheme(instructions)
-    do_simulate(robot, {curr, next})
+    update = String.next_grapheme(instructions)
+    do_simulate(robot, update)
   end
 
   defp engine(:north, pos, "L"), do: %{direction: :west, position: pos}
