@@ -91,14 +91,10 @@ defmodule RobotSimulator do
 
   Valid directions are: `:north`, `:east`, `:south`, `:west`
   """
-  def direction(%{direction: dir}) do
-    dir
-  end
+  def direction(%{direction: dir}), do: dir
 
   @doc """
   Return the robot's position.
   """
-  def position(%{position: position}) do
-    position
-  end
+  def position(%{position: position}), do: position
 end
