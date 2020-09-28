@@ -22,14 +22,8 @@ defmodule Bob do
   end
 
   defp yelling?(str) do
-    formatted =
-      str
-      |> format()
-
-    capitalized =
-      str
-      |> format()
-      |> capitalize
+    formatted = str |> format()
+    capitalized = formatted |> capitalize
 
     String.equivalent?(formatted, capitalized) && String.length(capitalized) > 0 && capitalized != "?"
   end
