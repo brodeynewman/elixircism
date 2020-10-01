@@ -1,7 +1,7 @@
-defmodule Ticketing.Server do
+defmodule Todo.Server do
   use GenServer
 
-  alias Ticketing.Database, as: DB
+  alias Todo.Database, as: DB
 
   def start() do
     GenServer.start(__MODULE__, nil)
@@ -13,23 +13,32 @@ defmodule Ticketing.Server do
     {:ok, %{database: pid}}
   end
 
-  def handle_call({:create_ticket, person, price}, _, %{database: db} = state) do
-    true = DB.insert(db, person, price)
+  def handle_call({:create_todo, person, item}, _, %{database: db} = state) do
+    # fetch previous record
+    case DB.find(db, person) do
+      [] -> DB.insert(db, person, %{ items: [item] })
+      [{_key, %{items: items}}] ->
+
+        DB.insert(db, person, %{ items: [item | items] })
+    end
+
+    # update record with new todo item
+    # updated_item = Map.put(result, item)
 
     {:reply, true, state}
   end
 
-  def handle_call({:get_tickets, person}, _, %{database: db} = state) do
+  def handle_call({:get_todos, person}, _, %{database: db} = state) do
     result = DB.find(db, person)
 
     {:reply, result, state}
   end
 
-  def get_tickets(pid, person) do
-    GenServer.call(pid, {:get_tickets, person})
+  def get(pid, person) do
+    GenServer.call(pid, {:get_todos, person})
   end
 
-  def create_ticket(pid, person, price) do
-    GenServer.call(pid, {:create_ticket, person, price})
+  def create(pid, person, item) do
+    GenServer.call(pid, {:create_todo, person, item})
   end
 end

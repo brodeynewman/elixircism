@@ -1,8 +1,8 @@
-defmodule Ticketing.Cache do
+defmodule Todo.Cache do
   use GenServer
 
-  alias Ticketing.Server
-  alias Ticketing.Backup
+  alias Todo.Server
+  alias Todo.Backup
 
   def init(_) do
     {:ok, _} = Backup.start()

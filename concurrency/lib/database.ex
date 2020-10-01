@@ -1,7 +1,7 @@
-defmodule Ticketing.Database do
+defmodule Todo.Database do
   use GenServer
 
-  @table_name :ticketing
+  @table_name :todo
 
   def init(_) do
     :ets.new(@table_name, [:set, :protected, :named_table])

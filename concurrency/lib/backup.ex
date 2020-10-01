@@ -1,4 +1,4 @@
-defmodule Ticketing.Backup do
+defmodule Todo.Backup do
   use GenServer
 
   @storage_dir "./backup"
