@@ -7,7 +7,7 @@ defmodule Todo.Database do
   @zero_index_max_workers 2
 
   def init(_) do
-    :ets.new(@table_name, [:set, :protected, :named_table])
+    :ets.new(@table_name, [:set, :public, :named_table])
     workers = spawn_workers()
 
     {:ok, workers}
