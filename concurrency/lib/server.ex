@@ -16,14 +16,11 @@ defmodule Todo.Server do
   def handle_call({:create_todo, person, item}, _, %{database: db} = state) do
     # fetch previous record
     case DB.find(db, person) do
-      [] -> DB.insert(db, person, %{ items: [item] })
+      [] ->
+        DB.insert(db, person, %{ items: [item] })
       [{_key, %{items: items}}] ->
-
         DB.insert(db, person, %{ items: [item | items] })
     end
-
-    # update record with new todo item
-    # updated_item = Map.put(result, item)
 
     {:reply, true, state}
   end
