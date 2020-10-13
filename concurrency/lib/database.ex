@@ -15,8 +15,8 @@ defmodule Todo.Database do
 
   defp spawn_workers do
     workers =
-      (for i <- 0..@zero_index_max_workers, do: i)
-        |> Enum.reduce(%{}, &(do_spawn_worker(&1, &2)))
+      for(i <- 0..@zero_index_max_workers, do: i)
+      |> Enum.reduce(%{}, &do_spawn_worker(&1, &2))
 
     workers
   end

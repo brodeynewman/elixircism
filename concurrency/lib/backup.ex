@@ -27,10 +27,11 @@ defmodule Todo.Backup do
   def handle_call({:read}, _, state) do
     location = path()
 
-    data = case File.read(location) do
-      {:ok, data} -> :erlang.binary_to_term(data)
-      _ -> %{}
-    end
+    data =
+      case File.read(location) do
+        {:ok, data} -> :erlang.binary_to_term(data)
+        _ -> %{}
+      end
 
     {:reply, data, state}
   end

@@ -18,9 +18,10 @@ defmodule Todo.Server do
   def handle_call({:create_todo, person, item}, _, state) do
     case DB.find(person) do
       [] ->
-        DB.insert(person, %{ items: [item] })
+        DB.insert(person, %{items: [item]})
+
       [{_key, %{items: items}}] ->
-        DB.insert(person, %{ items: [item | items] })
+        DB.insert(person, %{items: [item | items]})
     end
 
     {:reply, true, state}
@@ -37,7 +38,7 @@ defmodule Todo.Server do
   end
 
   def create(pid, person, item) do
-    IO.inspect "fooo"
+    IO.inspect("fooo")
     GenServer.call(pid, {:create_todo, person, item})
   end
 end

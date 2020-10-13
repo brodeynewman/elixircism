@@ -22,6 +22,7 @@ defmodule Todo.Cache do
     case Map.fetch(state, name) do
       {:ok, list} ->
         {:reply, list, state}
+
       :error ->
         {:ok, server} = Server.start()
 
