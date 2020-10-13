@@ -12,14 +12,16 @@ defmodule Todo.Cache do
     {:ok, initial_state}
   end
 
-  def start do
-    GenServer.start(__MODULE__, nil)
+  def start_link(_) do
+    IO.puts("Starting todo-cache")
+
+    GenServer.start_link(__MODULE__, nil, name: __MODULE__)
   end
 
   def handle_call({:server_process, name}, _, state) do
     case Map.fetch(state, name) do
-      {:ok, ticketed} ->
-        {:reply, ticketed, state}
+      {:ok, list} ->
+        {:reply, list, state}
       :error ->
         {:ok, server} = Server.start()
 
@@ -39,7 +41,7 @@ defmodule Todo.Cache do
     Backup.write(state)
   end
 
-  def start_process(pid, name) do
-    GenServer.call(pid, {:server_process, name})
+  def start_process(name) do
+    GenServer.call(__MODULE__, {:server_process, name})
   end
 end

@@ -4,29 +4,30 @@ defmodule Todo.Server do
   alias Todo.Database, as: DB
 
   def start() do
+    IO.puts("Starting server")
+
+    DB.start()
+
     GenServer.start(__MODULE__, nil)
   end
 
   def init(_) do
-    {:ok, pid} = DB.start()
-
-    {:ok, %{database: pid}}
+    {:ok, %{}}
   end
 
-  def handle_call({:create_todo, person, item}, _, %{database: db} = state) do
-    # fetch previous record
-    case DB.find(db, person) do
+  def handle_call({:create_todo, person, item}, _, state) do
+    case DB.find(person) do
       [] ->
-        DB.insert(db, person, %{ items: [item] })
+        DB.insert(person, %{ items: [item] })
       [{_key, %{items: items}}] ->
-        DB.insert(db, person, %{ items: [item | items] })
+        DB.insert(person, %{ items: [item | items] })
     end
 
     {:reply, true, state}
   end
 
-  def handle_call({:get_todos, person}, _, %{database: db} = state) do
-    result = DB.find(db, person)
+  def handle_call({:get_todos, person}, _, state) do
+    result = DB.find(person)
 
     {:reply, result, state}
   end
@@ -36,6 +37,7 @@ defmodule Todo.Server do
   end
 
   def create(pid, person, item) do
+    IO.inspect "fooo"
     GenServer.call(pid, {:create_todo, person, item})
   end
 end

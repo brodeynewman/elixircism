@@ -38,7 +38,9 @@ defmodule Todo.Database do
   end
 
   def start do
-    GenServer.start(__MODULE__, nil)
+    IO.puts("Starting database")
+
+    GenServer.start(__MODULE__, nil, name: __MODULE__)
   end
 
   def handle_call({:insert, key, value}, _, state) do
@@ -57,11 +59,11 @@ defmodule Todo.Database do
     {:reply, value, state}
   end
 
-  def insert(server, key, value) do
-    GenServer.call(server, {:insert, key, value})
+  def insert(key, value) do
+    GenServer.call(__MODULE__, {:insert, key, value})
   end
 
-  def find(server, key) do
-    GenServer.call(server, {:find, key})
+  def find(key) do
+    GenServer.call(__MODULE__, {:find, key})
   end
 end
