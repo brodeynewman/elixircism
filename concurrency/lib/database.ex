@@ -1,4 +1,6 @@
 defmodule Todo.Database do
+  use Supervisor
+
   alias Todo.DatabaseWorker, as: Worker
 
   @table_name :todo
@@ -7,7 +9,9 @@ defmodule Todo.Database do
   def init(_) do
     :ets.new(@table_name, [:set, :public, :named_table])
 
-    {:ok, nil}
+    children = spawn_workers()
+
+    Supervisor.init(children, strategy: :one_for_one)
   end
 
   defp spawn_workers do
@@ -24,6 +28,8 @@ defmodule Todo.Database do
     found = :erlang.phash2(key, @max_workers) + 1
 
     IO.inspect("Using worker: #{found} for operation.")
+
+    found
   end
 
   def child_spec(_) do
@@ -37,9 +43,7 @@ defmodule Todo.Database do
   def start_link do
     IO.puts("Starting database")
 
-    children = spawn_workers()
-
-    Supervisor.start_link(children, strategy: :one_for_one)
+    Supervisor.start_link(__MODULE__, nil, name: __MODULE__)
   end
 
   def insert(key, value) do

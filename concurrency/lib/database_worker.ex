@@ -24,10 +24,14 @@ defmodule Todo.DatabaseWorker do
   end
 
   def insert(worker, key, value) do
+    IO.puts("Worker: #{worker} running insert operation: #{key}")
+
     GenServer.call(via(worker), {:insert, key, value})
   end
 
   def find(worker, key) do
+    IO.puts("Worker: #{worker} running find operation: #{key}")
+
     GenServer.call(via(worker), {:find, key})
   end
 
