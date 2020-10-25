@@ -1,69 +1,56 @@
 defmodule Todo.Database do
-  use GenServer
-
   alias Todo.DatabaseWorker, as: Worker
 
   @table_name :todo
-  @zero_index_max_workers 2
+  @max_workers 3
 
   def init(_) do
     :ets.new(@table_name, [:set, :public, :named_table])
-    workers = spawn_workers()
 
-    {:ok, workers}
+    {:ok, nil}
   end
 
   defp spawn_workers do
-    workers =
-      for(i <- 0..@zero_index_max_workers, do: i)
-      |> Enum.reduce(%{}, &do_spawn_worker(&1, &2))
-
-    workers
+    Enum.map(1..@max_workers, &create_worker/1)
   end
 
-  defp do_spawn_worker(i, acc) do
-    Map.put(acc, i, create_worker())
+  defp create_worker(id) do
+    worker_spec = {Todo.DatabaseWorker, {@table_name, id}}
+
+    Supervisor.child_spec(worker_spec, id: id)
   end
 
-  defp create_worker do
-    {:ok, pid} = Worker.start(@table_name)
+  defp choose_worker(key) do
+    found = :erlang.phash2(key, @max_workers) + 1
 
-    pid
+    IO.inspect("Using worker: #{found} for operation.")
   end
 
-  defp choose_worker(key, workers) do
-    ind = :erlang.phash2(key, 3)
-
-    workers[ind]
+  def child_spec(_) do
+    %{
+      id: __MODULE__,
+      start: {__MODULE__, :start_link, []},
+      type: :supervisor
+    }
   end
 
-  def start do
+  def start_link do
     IO.puts("Starting database")
 
-    GenServer.start(__MODULE__, nil, name: __MODULE__)
-  end
+    children = spawn_workers()
 
-  def handle_call({:insert, key, value}, _, state) do
-    pid = choose_worker(key, state)
-
-    Worker.insert(pid, key, value)
-
-    {:reply, true, state}
-  end
-
-  def handle_call({:find, key}, _, state) do
-    pid = choose_worker(key, state)
-
-    value = Worker.find(pid, key)
-
-    {:reply, value, state}
+    Supervisor.start_link(children, strategy: :one_for_one)
   end
 
   def insert(key, value) do
-    GenServer.call(__MODULE__, {:insert, key, value})
+    key
+    |> choose_worker()
+    |> Worker.insert(key, value)
   end
 
   def find(key) do
-    GenServer.call(__MODULE__, {:find, key})
+    key
+    |> choose_worker()
+    |> Worker.find(key)
   end
 end

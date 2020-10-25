@@ -5,7 +5,7 @@ defmodule Todo.Cache do
   alias Todo.Backup
 
   def init(_) do
-    {:ok, _} = Backup.start()
+    {:ok, _} = Backup.start_link()
     initial_state = Backup.read()
 
     Process.flag(:trap_exit, true)
