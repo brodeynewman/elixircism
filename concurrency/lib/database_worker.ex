@@ -5,10 +5,10 @@ defmodule Todo.DatabaseWorker do
     {:ok, table_name}
   end
 
-  def start_link({table_name, worker_id}) do
-    IO.puts("Starting database-worker: #{worker_id} with ets table name: #{table_name}")
+  def start_link([table_name]) do
+    IO.puts("Starting database worker")
 
-    GenServer.start_link(__MODULE__, table_name, name: via(worker_id))
+    GenServer.start_link(__MODULE__, table_name)
   end
 
   def handle_call({:insert, key, value}, _, table_name) do
@@ -24,18 +24,14 @@ defmodule Todo.DatabaseWorker do
   end
 
   def insert(worker, key, value) do
-    IO.puts("Worker: #{worker} running insert operation: #{key}")
+    IO.inspect("Worker running insert operation: #{key}")
 
-    GenServer.call(via(worker), {:insert, key, value})
+    GenServer.call(worker, {:insert, key, value})
   end
 
   def find(worker, key) do
-    IO.puts("Worker: #{worker} running find operation: #{key}")
+    IO.inspect("Worker running find operation: #{key}")
 
-    GenServer.call(via(worker), {:find, key})
-  end
-
-  defp via(worker) do
-    Todo.Registry.via_tuple({__MODULE__, worker})
+    GenServer.call(worker, {:find, key})
   end
 end
