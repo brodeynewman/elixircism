@@ -1,12 +1,12 @@
 defmodule Todo.Server do
-  use GenServer
+  use GenServer, restart: :temporary
 
   alias Todo.Database, as: DB
 
-  def start() do
+  def start_link(name) do
     IO.puts("Starting server")
 
-    GenServer.start_link(__MODULE__, nil)
+    GenServer.start_link(__MODULE__, nil, name: via(name))
   end
 
   def init(_) do
@@ -35,8 +35,11 @@ defmodule Todo.Server do
     GenServer.call(pid, {:get_todos, person})
   end
 
+  defp via(name) do
+    Todo.Registry.via_tuple({__MODULE__, name})
+  end
+
   def create(pid, person, item) do
-    IO.inspect("fooo")
     GenServer.call(pid, {:create_todo, person, item})
   end
 end
