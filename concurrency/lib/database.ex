@@ -2,7 +2,6 @@ defmodule Todo.Database do
   use Supervisor
 
   @table_name :todo
-  @max_workers 3
 
   defp poolboy_config do
     [
